@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read It All Admin Panel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;background:#f8fafc;color:#1e293b;min-height:100vh}
+/* ─── LOGIN ─── */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#070d1b}
+.login-card{background:#fff;border-radius:16px;padding:38px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.login-logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;margin-bottom:28px}
+.login-orb{width:36px;height:36px;background:#f59e0b;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000}
+.field-lbl{font-size:12px;font-weight:600;color:#475569;margin-bottom:5px;display:block}
+.field-inp{width:100%;padding:11px 13px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;margin-bottom:14px;color:#1e293b;background:#fff}
+.field-inp:focus{border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+.login-btn{width:100%;padding:12px;border-radius:8px;border:none;background:#f59e0b;color:#000;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:-.2px}
+.login-btn:hover{background:#fcd34d}
+.login-err{background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:9px 13px;font-size:12px;color:#dc2626;margin-top:12px;display:none;font-weight:600}
+.login-hint{font-size:11px;color:#94a3b8;text-align:center;margin-top:14px}
+/* ─── DASHBOARD ─── */
+.dash{display:none;flex-direction:column;min-height:100vh}
+.dash-hdr{background:#070d1b;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dash-logo{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:#f1f5f9}
+.dash-orb{width:30px;height:30px;background:#f59e0b;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#000}
+.badge-admin{padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;font-size:11px;font-weight:700}
+.logout-btn{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#94a3b8;font-size:12px;cursor:pointer}
+.logout-btn:hover{background:rgba(255,255,255,.08);color:#f1f5f9}
+.dash-body{padding:28px;flex:1;max-width:1200px;width:100%}
+.page-title{font-size:22px;font-weight:800;margin-bottom:5px}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:22px}
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.stat-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.stat-lbl{font-size:11px;color:#64748b;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.stat-val{font-size:30px;font-weight:800;color:#1e293b}
+.stat-val.g{color:#10b981}
+.stat-val.a{color:#f59e0b}
+.stat-val.b{color:#3b82f6}
+/* Card */
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card-hdr{padding:15px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-title{font-size:15px;font-weight:700}
+.card-sub{font-size:12px;color:#64748b}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.srch{padding:8px 13px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;width:260px}
+.srch:focus{border-color:#f59e0b}
+.tbtn{padding:8px 14px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:12px;font-weight:600;cursor:pointer}
+.tbtn:hover{background:#f8fafc}
+/* Table */
+table{width:100%;border-collapse:collapse}
+th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid #e2e8f0;background:#f8fafc;white-space:nowrap}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.badge-pro{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#d1fae5;color:#065f46}
+.badge-free{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#f1f5f9;color:#64748b}
+.act-btn{padding:4px 11px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#475569;font-size:11px;cursor:pointer;font-weight:600;margin-right:4px}
+.act-btn:hover{background:#f8fafc}
+.act-btn.promote{border-color:#bbf7d0;color:#065f46}
+.act-btn.demote{border-color:#fecaca;color:#dc2626}
+.act-btn.del{border-color:#fecaca;color:#dc2626}
+.act-btn.del:hover{background:#fef2f2}
+.empty{padding:50px;text-align:center;color:#94a3b8}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:12px;color:#92400e;margin-bottom:20px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN PAGE ─── -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-orb">&#127908;</div>
+      <span>Read It All</span>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:5px">Admin Panel</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:24px">Restricted access &mdash; administrators only</div>
+    <label class="field-lbl">Username</label>
+    <input type="text" id="adminUser" class="field-inp" placeholder="Enter username" autocomplete="username" onkeydown="if(event.key===&#39;Enter&#39;)doAdminLogin()">
+    <label class="field-lbl">Password</label>
+    <input type="password" id="adminPwd" class="field-inp" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key===&#39;Enter&#39;)doAdminLogin()">
+    <button class="login-btn" onclick="doAdminLogin()">Sign In to Dashboard &rarr;</button>
+    <div class="login-err" id="loginErr">&#10005; Incorrect username or password. Please try again.</div>
+    <div class="login-hint">Default credentials: edadmin / ReadItAll2025</div>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD ─── -->
+<div class="dash" id="dashboard">
+  <div class="dash-hdr">
+    <div class="dash-logo">
+      <div class="dash-orb">&#127908;</div>
+      Read It All &mdash; Admin
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="badge-admin">Admin &mdash; Ed</span>
+      <button class="logout-btn" onclick="adminLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub" id="lastRefresh">Loading data...</div>
+
+    <div class="note">
+      <strong>&#128161; Note:</strong> Member accounts are stored in this browser&rsquo;s localStorage (<code>ria_users_db</code>).
+      For production use with multiple devices, connect to a backend database (Firebase, Supabase, or a custom API).
+      Members who sign up on other devices will appear here once they visit this browser.
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-lbl">Total Members</div><div class="stat-val" id="sTot">0</div></div>
+      <div class="stat-card"><div class="stat-lbl">Pro Members</div><div class="stat-val g" id="sPro">0</div></div>
+      <div class="stat-card"><div class="stat-lbl">Free Members</div><div class="stat-val b" id="sFree">0</div></div>
+      <div class="stat-card"><div class="stat-lbl">Monthly Revenue</div><div class="stat-val a" id="sRev">$0</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">&#128100; All Members</div>
+          <div class="card-sub" id="memberCount">0 members</div>
+        </div>
+        <div class="toolbar">
+          <input class="srch" id="memberSearch" placeholder="Search name or email..." oninput="renderTable()">
+          <button class="tbtn" onclick="loadData()">&#8635; Refresh</button>
+          <button class="tbtn" onclick="exportCSV()">&#8659; Export CSV</button>
+          <button class="tbtn" onclick="addTestMember()" style="border-color:#bbf7d0;color:#065f46">+ Add Test Member</button>
+        </div>
+      </div>
+      <div id="tableWrap">
+        <div class="empty"><div style="font-size:36px;margin-bottom:10px">&#128100;</div>No members yet. Sign-ups from the main app appear here.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">&#128205; Recent Sign-ups</div>
+          <div class="card-sub" id="recentLbl">Last 7 days</div>
+        </div>
+      </div>
+      <div id="recentWrap">
+        <div class="empty">No recent sign-ups in the last 7 days.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">&#9993; Send Message to Member</div>
+      </div>
+      <div style="padding:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label class="field-lbl" style="color:#475569">Select Member</label>
+            <select id="msgTarget" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none;background:#fff;color:#1e293b">
+              <option value="">-- Select a member --</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-lbl" style="color:#475569">Subject</label>
+            <input type="text" id="msgSubject" placeholder="Message subject" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none">
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <label class="field-lbl" style="color:#475569">Message</label>
+          <textarea id="msgBody" style="width:100%;height:90px;padding:9px 12px;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none;resize:none;font-family:inherit;line-height:1.5" placeholder="Type your message here..."></textarea>
+        </div>
+        <button onclick="sendAdminMsg()" style="padding:10px 24px;border-radius:8px;border:none;background:#f59e0b;color:#000;font-size:13px;font-weight:800;cursor:pointer">Send via Email Client &#10148;</button>
+        <div style="font-size:11px;color:#94a3b8;margin-top:7px">Opens your email client with the message pre-filled. Replies go to Yodebepro@gmail.com</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── CREDENTIALS ───
+// Username: edadmin  |  Password: ReadItAll2025
+var ADMIN_USER = "edadmin";
+var ADMIN_PASS = "ReadItAll2025";
+var DB_KEY = "ria_users_db";
+var allUsers = [];
+
+function doAdminLogin() {
+  var u = document.getElementById("adminUser").value;
+  var p = document.getElementById("adminPwd").value;
+  document.getElementById("loginErr").style.display = "none";
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("dashboard").style.display = "flex";
+    loadData();
+  } else {
+    document.getElementById("loginErr").style.display = "block";
+  }
+}
+
+function adminLogout() {
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
+  document.getElementById("adminUser").value = "";
+  document.getElementById("adminPwd").value = "";
+  document.getElementById("loginErr").style.display = "none";
+}
+
+function loadData() {
+  try { allUsers = JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
+  catch(e) { allUsers = []; }
+  var pro = allUsers.filter(function(u){ return u.isPro; }).length;
+  var free = allUsers.length - pro;
+  document.getElementById("sTot").textContent = allUsers.length;
+  document.getElementById("sPro").textContent = pro;
+  document.getElementById("sFree").textContent = free;
+  document.getElementById("sRev").textContent = "$" + (pro * 11).toLocaleString();
+  document.getElementById("memberCount").textContent = allUsers.length + " member" + (allUsers.length !== 1 ? "s" : "");
+  document.getElementById("lastRefresh").textContent = "Last refreshed: " + new Date().toLocaleTimeString();
+  renderTable();
+  renderRecent();
+  populateMsgSelect();
+}
+
+function getFiltered() {
+  var q = (document.getElementById("memberSearch").value || "").toLowerCase();
+  return allUsers.filter(function(u) {
+    return !q || u.email.toLowerCase().includes(q) ||
+      ((u.firstName || "") + " " + (u.lastName || "")).toLowerCase().includes(q);
+  });
+}
+
+function renderTable() {
+  var users = getFiltered();
+  if (!users.length) {
+    document.getElementById("tableWrap").innerHTML = "<div class=\"empty\">No members match your search.</div>";
+    return;
+  }
+  var rows = users.map(function(u) {
+    return "<tr>" +
+      "<td><strong>" + esc(u.firstName||"") + " " + esc(u.lastName||"") + "</strong></td>" +
+      "<td style=\"color:#64748b\">" + esc(u.email) + "</td>" +
+      "<td><span class=\"badge-" + (u.isPro ? "pro" : "free") + "\">" + (u.isPro ? "PRO" : "Free") + "</span></td>" +
+      "<td style=\"color:#64748b\">" + (u.joinDate ? new Date(u.joinDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "N/A") + "</td>" +
+      "<td style=\"color:#64748b\">" + esc(u.oauth || "Email") + "</td>" +
+      "<td>" +
+        "<button class=\"act-btn " + (u.isPro ? "demote" : "promote") + "\" onclick=\"togglePro('" + u.id + "')\">" + (u.isPro ? "Remove Pro" : "Grant Pro") + "</button>" +
+        "<button class=\"act-btn\" onclick=\"copyEmail('" + u.email + "')\">Copy Email</button>" +
+        "<button class=\"act-btn del\" onclick=\"deleteUser('" + u.id + "')\">Delete</button>" +
+      "</td>" +
+    "</tr>";
+  });
+  document.getElementById("tableWrap").innerHTML =
+    "<table><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Joined</th><th>Auth</th><th>Actions</th></tr></thead><tbody>" +
+    rows.join("") + "</tbody></table>";
+}
+
+function renderRecent() {
+  var week = Date.now() - 7 * 24 * 3600 * 1000;
+  var recent = allUsers
+    .filter(function(u){ return u.joinDate && new Date(u.joinDate).getTime() > week; })
+    .sort(function(a,b){ return new Date(b.joinDate) - new Date(a.joinDate); });
+  document.getElementById("recentLbl").textContent = "Last 7 days — " + recent.length + " sign-up" + (recent.length !== 1 ? "s" : "");
+  if (!recent.length) { document.getElementById("recentWrap").innerHTML = "<div class=\"empty\">No sign-ups in the last 7 days.</div>"; return; }
+  var rows = recent.map(function(u) {
+    return "<tr>" +
+      "<td><strong>" + esc(u.firstName||"") + " " + esc(u.lastName||"") + "</strong></td>" +
+      "<td style=\"color:#64748b\">" + esc(u.email) + "</td>" +
+      "<td><span class=\"badge-" + (u.isPro ? "pro" : "free") + "\">" + (u.isPro ? "PRO" : "Free") + "</span></td>" +
+      "<td style=\"color:#64748b\">" + new Date(u.joinDate).toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) + "</td>" +
+    "</tr>";
+  });
+  document.getElementById("recentWrap").innerHTML =
+    "<table><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Signed Up</th></tr></thead><tbody>" +
+    rows.join("") + "</tbody></table>";
+}
+
+function populateMsgSelect() {
+  var sel = document.getElementById("msgTarget");
+  sel.innerHTML = "<option value=\"\">-- Select a member --</option>" +
+    allUsers.map(function(u){
+      return "<option value=\"" + esc(u.email) + "\">" + esc(u.firstName||"") + " " + esc(u.lastName||"") + " (" + esc(u.email) + ")</option>";
+    }).join("");
+}
+
+function togglePro(id) {
+  var db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+  var u = db.find(function(x){ return x.id === id; });
+  if (!u) return;
+  u.isPro = !u.isPro;
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  loadData();
+}
+
+function deleteUser(id) {
+  if (!confirm("Delete this member permanently? This cannot be undone.")) return;
+  var db = JSON.parse(localStorage.getItem(DB_KEY) || "[]").filter(function(u){ return u.id !== id; });
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  loadData();
+}
+
+function copyEmail(email) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(email).then(function(){ alert("Copied: " + email); });
+  } else {
+    prompt("Copy this email:", email);
+  }
+}
+
+function exportCSV() {
+  if (!allUsers.length) { alert("No members to export."); return; }
+  var rows = [["First Name","Last Name","Email","Plan","Join Date","Auth"]];
+  allUsers.forEach(function(u){
+    rows.push([u.firstName||"",u.lastName||"",u.email,u.isPro?"Pro":"Free",u.joinDate?new Date(u.joinDate).toLocaleDateString():"",u.oauth||"Email"]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"' + String(v).replace(/"/g,'""')+'"'; }).join(","); }).join("\n");
+  var blob = new Blob([csv], {type:"text/csv"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a"); a.href = url; a.download = "readitall-members.csv";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); if(a.parentNode)a.parentNode.removeChild(a); }, 5000);
+}
+
+function addTestMember() {
+  var db = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+  var n = db.length + 1;
+  var isPro = n % 3 === 0;
+  var mem = {
+    id: "test-" + Date.now(),
+    firstName: ["Alex","Jordan","Morgan","Taylor","Sam","Chris","Jamie"][n%7],
+    lastName: ["Smith","Johnson","Williams","Brown","Davis"][n%5],
+    email: "testuser" + n + "@example.com",
+    pwd: "x",
+    isPro: isPro,
+    joinDate: new Date(Date.now() - Math.random()*14*24*3600*1000).toISOString(),
+    oauth: ["Email","Google","Outlook"][n%3]
+  };
+  db.push(mem);
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  loadData();
+}
+
+function sendAdminMsg() {
+  var to = document.getElementById("msgTarget").value;
+  var subject = document.getElementById("msgSubject").value || "Message from Read It All";
+  var body = document.getElementById("msgBody").value;
+  if (!to) { alert("Please select a member."); return; }
+  if (!body.trim()) { alert("Please type a message."); return; }
+  var link = "mailto:Yodebepro@gmail.com?bcc=" + encodeURIComponent(to) +
+    "&subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(body + "\n\n---\nSent from Read It All Admin to: " + to);
+  window.open(link);
+}
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+</script>
+</body>
+</html>
